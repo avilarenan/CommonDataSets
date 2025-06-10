@@ -32,15 +32,22 @@ def process_farm(farm_params):
     window = farm_params["window"]
     exogenous_feature = str(farm_params["exogenous_feature"])
     target_feature = str(farm_params["target_feature"])
-    ret = farm(
+    shaping_ratio = pd.Series(farm(
         refTS=df_raw[target_feature].values,
         qryTS=df_raw[str(exogenous_feature)].values,
         ff_align=False,
         lcwin=window,
         fuzzyc=[1]
-    )["qts_shaped"]
+    )["rel_local_fuzz"])
+    shaping_ratio_inverted = (shaping_ratio - 1).abs() # NOTE: INVERTING
 
-    return {"shaped" : ret}, exogenous_feature
+    shaping_ratio = shaping_ratio.fillna(1) # NOTE: keep as it is if we can't calculate a ratio (NaN case)
+    shaping_ratio_inverted = shaping_ratio_inverted.fillna(1) # NOTE: keep as it is if we can't calculate a ratio (NaN case)
+
+    ret = df_raw[str(exogenous_feature)] * shaping_ratio
+    ret_inverted = df_raw[str(exogenous_feature)] * shaping_ratio_inverted
+
+    return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
 def process_rollcorr(params):
     '''

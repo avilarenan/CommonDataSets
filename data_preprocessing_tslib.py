@@ -92,8 +92,6 @@ for dataset_name in tqdm(datasets_names, desc="Datasets"):
                 
             df_processed = df_raw.copy()
             df_processed_inverted = df_raw.copy()
-            
-            skip_inverted = False
 
             for agg_qts_shaped, feature in results_processed:
                 if feature == target_ts:
@@ -102,19 +100,16 @@ for dataset_name in tqdm(datasets_names, desc="Datasets"):
                 qts_shaped = agg_qts_shaped.get("shaped")
                 if qts_shaped is None:
                     raise Exception(f"No shaped ts provided: {qts_shaped}")
-                else:
-                    df_processed[str(feature)] = qts_shaped
+                
+                df_processed[str(feature)] = qts_shaped
                 
                 qts_shaped_inverted = agg_qts_shaped.get("inverted_shaped")
-                if qts_shaped_inverted is None:
-                    skip_inverted = True
-                else:
-                    df_processed_inverted[str(feature)] = qts_shaped_inverted
+
+                df_processed_inverted[str(feature)] = qts_shaped_inverted
 
 
             df_processed_unique_id = f"{target_ts}_w{window}_exogenous_{process_fn.__name__}"
             df_processed.to_csv(f"./processed_data/{dataset_name}_{df_processed_unique_id}.csv", index=False)
 
-            if not skip_inverted:
-                df_processed_unique_id_inverted = f"{target_ts}_w{window}_exogenous_{process_fn.__name__}_inverted"
-                df_processed_inverted.to_csv(f"./processed_data/{dataset_name}_{df_processed_unique_id_inverted}.csv", index=False)
+            df_processed_unique_id_inverted = f"{target_ts}_w{window}_exogenous_{process_fn.__name__}_inverted"
+            df_processed_inverted.to_csv(f"./processed_data/{dataset_name}_{df_processed_unique_id_inverted}.csv", index=False)
