@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 import joblib
 from datasets_metadata import ts_metadata
 import contextlib
-from preprocessing_utilities import process_farm, process_rollcorr, process_rollcov, process_entropy, process_mutual_info, process_dtw
+from preprocessing_utilities import pfarm, prollcorr, prollcov, pentropy, pmutual_info, pdtw
 warnings.filterwarnings('ignore')
 
 PARALLEL = True
@@ -52,14 +52,13 @@ for dataset_name in tqdm(datasets_names, desc="Datasets"):
     valid_size = ts_metadata[dataset_name]["valid_size"]
     farm_windows = ts_metadata[dataset_name]["farm_windows"]
 
-    # # SHAPING
-
+    # SHAPING
     list_of_process_fns = [
-        process_farm,
-        process_rollcorr,
-        process_rollcov,
-        process_entropy,
-        process_mutual_info,
+        pfarm,
+        prollcorr,
+        prollcov,
+        pentropy,
+        pmutual_info,
         # process_dtw,
     ]
     
@@ -108,8 +107,8 @@ for dataset_name in tqdm(datasets_names, desc="Datasets"):
                 df_processed_inverted[str(feature)] = qts_shaped_inverted
 
 
-            df_processed_unique_id = f"{target_ts}_w{window}_exogenous_{process_fn.__name__}"
+            df_processed_unique_id = f"w{window}_{process_fn.__name__}"
             df_processed.to_csv(f"./processed_data/{dataset_name}_{df_processed_unique_id}.csv", index=False)
 
-            df_processed_unique_id_inverted = f"{target_ts}_w{window}_exogenous_{process_fn.__name__}_inverted"
+            df_processed_unique_id_inverted = f"w{window}_i{process_fn.__name__}"
             df_processed_inverted.to_csv(f"./processed_data/{dataset_name}_{df_processed_unique_id_inverted}.csv", index=False)

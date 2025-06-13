@@ -18,7 +18,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 
 warnings.filterwarnings('once')
 
-def process_farm(farm_params):
+def pfarm(farm_params):
     '''
     FARM SHAPING
     farm_params = {
@@ -49,7 +49,7 @@ def process_farm(farm_params):
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
-def process_rollcorr(params):
+def prollcorr(params):
     '''
     CORRELATION SHAPING
     params = {
@@ -76,7 +76,7 @@ def process_rollcorr(params):
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
-def process_rollcov(params):
+def prollcov(params):
     '''
     COVARIANCE SHAPING
     params = {
@@ -103,7 +103,7 @@ def process_rollcov(params):
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
-def process_entropy(params):
+def pentropy(params):
     '''
     RELATIVE ENTROPY SHAPING
     params = {
@@ -138,7 +138,7 @@ def process_entropy(params):
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
-def process_mutual_info(params):
+def pmutual_info(params):
     '''
     MUTUAL INFORMATION SHAPING
     params = {
@@ -173,7 +173,7 @@ def process_mutual_info(params):
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
 
-def process_dtw(params):
+def pdtw(params):
     '''
     DTW DISTANCE SHAPING
     params = {
