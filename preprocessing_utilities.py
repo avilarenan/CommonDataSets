@@ -16,6 +16,8 @@ import pandas as pd
 
 from numpy.lib.stride_tricks import sliding_window_view
 
+from scipy.stats import skewnorm
+
 warnings.filterwarnings('once')
 
 def pfarm(farm_params):
@@ -215,3 +217,51 @@ def pdtw(params):
     ret_inverted = df_raw[str(exogenous_feature)] * shaping_ratio_inverted
 
     return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
+
+def pnoise(params, skew=0):
+    '''
+    CORRELATION SHAPING
+    params = {
+        "df_raw" : df_raw,
+        "window" : window,
+        "exogenous_feature": feature,
+        "target_feature": target
+    }
+    '''
+
+    seed_value = 42
+    np.random.seed(seed_value)
+
+    df_raw = params["df_raw"]
+    window = params["window"]
+    exogenous_feature = str(params["exogenous_feature"])
+    target_feature = str(params["target_feature"])
+
+    from scipy.stats import skewnorm
+
+    # Define parameters for the skew-normal distribution
+    skew = 0  # Skewness parameter (positive for right skew, negative for left skew)
+    loc = 0  # Location parameter (mean)
+    scale = 1  # Scale parameter (standard deviation)
+    series_size = len(target_feature)  # Number of samples
+
+    # Generate random samples from a skew-normal distribution
+    skew_normal_noise = skewnorm.rvs(skew, loc=loc, scale=scale, size=series_size)
+
+    # Create a Pandas Series from the generated noise
+    skew_noise_series = pd.Series(skew_normal_noise)
+    saliency = pd.Series(skew_noise_series).rolling(window).mean()
+    shaping_ratio = (saliency-saliency.min())/(saliency.max() - saliency.min()) # normalizing between 0 and 1
+
+    shaping_ratio_inverted = (shaping_ratio - 1).abs() # NOTE: INVERTING
+
+    shaping_ratio = shaping_ratio.fillna(1) # NOTE: keep as it is if we can't calculate a ratio (NaN case)
+    shaping_ratio_inverted = shaping_ratio_inverted.fillna(1) # NOTE: keep as it is if we can't calculate a ratio (NaN case)
+
+    ret = df_raw[str(exogenous_feature)] * shaping_ratio
+    ret_inverted = df_raw[str(exogenous_feature)] * shaping_ratio_inverted
+
+    return {"shaped" : ret, "inverted_shaped": ret_inverted}, exogenous_feature
+
+def pnoiseskew10(params):
+    return pnoise(params, skew=10)

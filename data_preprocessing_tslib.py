@@ -14,12 +14,12 @@ warnings.filterwarnings('ignore')
 PARALLEL = True
 datasets_names = [
     "ETTh1",
-    # "ETTh2",
-    # "ETTm1",
-    # "ETTm2",
-    # "Weather",
-    # "ECL",
-    # "TrafficL"
+    "ETTh2",
+    "ETTm1",
+    "ETTm2",
+    "Weather",
+    "ECL",
+    "TrafficL"
 ]
 
 @contextlib.contextmanager
